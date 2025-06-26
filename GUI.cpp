@@ -2,10 +2,14 @@
 // Created by justi on 6/26/2025.
 //
 #include "GUI.h"
+
+#include <cstdio>
+
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
+#include <string>
 #include <tchar.h>
 
 // DirectX globals
@@ -22,6 +26,10 @@ void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// this is for saving the text of a user
+static char buffer[256] = ""; // temporary c-string buffer
+static std::string saved_input;
 
 int run(int argc, char** argv){
     ImGui_ImplWin32_EnableDpiAwareness();
@@ -96,17 +104,42 @@ int run(int argc, char** argv){
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("My Simple Window");
+        ImGui::Begin("Enter your ");
         ImGui::Text("Hello, ImGui!");
-        ImGui::Text("Hello, this is the next text!");
+
+
+        // draw the text input box
+        ImGui::InputText("###empty", buffer, sizeof(buffer));
+
+
+        ImGui::SameLine();
+        // button to save the input
+        if (ImGui::Button("save")) {
+            saved_input = std::string(buffer); // store into std::string
+            buffer[0] = '\0';
+        }
+
+        // show the saved input
+        ImGui::Text("saved text: %s", saved_input.c_str());
+
+
+
+        // action listener for the run button
+        if (ImGui::Button("Run")) {
+
+        }
+
+
+
+
 
         // Add a close button
         if (ImGui::Button("Close Window")) {
+
             done = true;
         }
 
         ImGui::End();
-
         ImGui::Render();
 
         // Clear with fully transparent color (alpha = 0)
