@@ -20,11 +20,16 @@ static ID3D11RenderTargetView*  g_mainRenderTargetView = nullptr;
 static bool                     g_SwapChainOccluded = false;
 static UINT                     g_ResizeWidth = 0, g_ResizeHeight = 0;
 
+
+// Helper functions
+void handle_input();
 // Function declarations
 bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
+
+
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // this is for saving the text of a user
@@ -103,26 +108,21 @@ int run(int argc, char** argv){
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
-
-        ImGui::Begin("Enter your ");
-        ImGui::Text("Hello, ImGui!");
+        ImGui::Begin("GUI");
 
 
-        // draw the text input box
-        ImGui::InputText("###empty", buffer, sizeof(buffer));
-
-
-        ImGui::SameLine();
-        // button to save the input
-        if (ImGui::Button("save")) {
-            saved_input = std::string(buffer); // store into std::string
-            buffer[0] = '\0';
+        ImGui::Text("Enter your name:");
+        if (ImGui::InputText("###empty", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+            handle_input();
         }
 
-        // show the saved input
-        ImGui::Text("saved text: %s", saved_input.c_str());
+        // button to save the input
+        ImGui::SameLine();
+        if (ImGui::Button("save")) {
+            handle_input();
+        }
 
-
+        ImGui::Text("Saved: %s", saved_input.c_str());
 
         // action listener for the run button
         if (ImGui::Button("Run")) {
@@ -161,6 +161,8 @@ int run(int argc, char** argv){
     return 0;
 }
 
+
+
 bool CreateDeviceD3D(HWND hWnd){
     DXGI_SWAP_CHAIN_DESC sd = {};
     sd.BufferCount = 2;
@@ -185,6 +187,11 @@ bool CreateDeviceD3D(HWND hWnd){
 
     CreateRenderTarget();
     return true;
+}
+
+void handle_input() {
+    saved_input = std::string(buffer); // store into std::string
+    buffer[0] = '\0';
 }
 
 void CleanupDeviceD3D(){
